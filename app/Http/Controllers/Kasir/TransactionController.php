@@ -106,6 +106,8 @@ class TransactionController extends Controller
                         $productTransaction->quantity = 1;
                         $productTransaction->disc_rp = $request->disc_rp;
                         $productTransaction->disc_prc = $request->disc_prc;
+                        $productTransaction->price = $product->price;
+                        $productTransaction->capital_price = $product->capital_price ?? null;
                         $productTransaction->status = '0';
                         $productTransaction->save();
                         $productTransaction = ProductTransaction::where('id', $productTransaction->id)->with('product')->first();
@@ -130,6 +132,8 @@ class TransactionController extends Controller
                     $productTransaction->quantity = 1;
                     $productTransaction->disc_rp = $request->disc_rp;
                     $productTransaction->disc_prc = $request->disc_prc;
+                    $productTransaction->price = $product->price;
+                    $productTransaction->capital_price = $product->capital_price ?? null;
                     $productTransaction->status = '0';
                     $productTransaction->save();
                     $productTransaction = ProductTransaction::where('id', $productTransaction->id)->with('product')->first();

@@ -44,14 +44,19 @@
                 <th>Online/Offline</th>
                 <th>Metode Pembayaran</th>
                 <th>Total Penjualan</th>
+                <th style="color: red">Profit</th>
                 <th>Tanggal</th>
                 <th>Aksi</th>
             </thead>
               <tbody>
                 @php
                 $totalOrder = [];
+                $sumProfit = [];
                 @endphp
                   @foreach($transactions as $key => $transaction)
+                  @php
+                    $profitItem = [];
+                  @endphp
                   <tr>
                       <td>{{ $key+1 }}</td>
                       <td>{{ $transaction->transaction_code }} <div style="font-size: 75%">{{ $transaction->user->name }}</div></td>
@@ -66,6 +71,17 @@
                         @endif
                       </td>
                       <td>@currency($transaction->purchase_order)</td>
+                      <td style="color: red">
+                        @foreach ($transaction->productTransaction as $productTransaction)
+                            @php
+                                $profitItem[] = ($productTransaction->price - $productTransaction->capital_price) * $productTransaction->quantity;
+                            @endphp
+                        @endforeach
+                        @php
+                            $totalProfit = array_sum($profitItem);
+                        @endphp
+                        @currency($totalProfit)
+                      </td>
                       <td>{{ date('d M Y H:i:s', strtotime($transaction->created_at)) }}</td>
                       <td>
                           <a href="{{ route('admin.report.show', $transaction->id) }}"><i class="fas fa-eye"></i></a>
@@ -74,13 +90,17 @@
                   </tr>
                   @php
                   $totalOrder[] = $transaction->purchase_order;
+                  $sumProfit[] = $totalProfit;
                   @endphp
                   @endforeach
                   
                     @php
                     $total = array_sum($totalOrder);
+                    $totalSumProfit = array_sum($sumProfit);
                     @endphp
-                    <p>Total : @currency($total)</p>
+                    <b>Total Penjualan : @currency($total)</b>
+                    <br>
+                    <b style="color: red">Total Profit : @currency($totalSumProfit)</b>
                   
               </tbody>
             </table>

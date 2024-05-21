@@ -86,7 +86,7 @@
                     ?>
                   @foreach($products as $product)
                   <tr>
-                      <td>{{ $i++ }}</td>
+                      <td>{{($products->currentPage() - 1) * $products->perPage() + $loop->iteration}}</td>
                       <td>{{ $product->product_code }}</td>
                       <td>{{ $product->name }}</td>
                       <td>{{ $product->quantity }}</td>

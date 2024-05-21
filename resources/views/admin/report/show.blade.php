@@ -38,26 +38,19 @@
               <div class="col-6-offset-0">
                 <div class="container-fluid">
                   <table>
-                    @if ($transaction->member_id)
                     <tr>
-                      <td>Member</td>
+                      <td><b>Total Profit</b></td>
                       <td> : </td>
+                      @foreach ($transaction->productTransaction as $productTransaction)
                       @php
-                      $member = \App\Models\User::where('member_id', $transaction->member_id)->first();
+                          $profitItem[] = ($productTransaction->price - $productTransaction->capital_price) * $productTransaction->quantity;
                       @endphp
-                      <td>{{ $member->name }}</td>
+                      @endforeach
+                      @php
+                          $totalProfit = array_sum($profitItem);
+                      @endphp
+                      <td><b>@currency($totalProfit)</b></td>
                     </tr>
-                    <tr>
-                      <td>Id Member </td>
-                      <td> : </td>
-                      <td>{{ $member->member_id }}</td>
-                    </tr>
-                    <tr>
-                      <td>Transaksi ini Mendapat</td>
-                      <td> {{ $transaction->earn_point }} </td>
-                      <td> Point</td>
-                    </tr>
-                    @endif
                   </table>
                 </div>
               </div>
@@ -73,13 +66,19 @@
                 Nama Produk - Kode
               </th>
               <th>
+                Harga Modal
+              </th>
+              <th>
                 Jumlah
               </th>
               <th>
-                Harga
+                Harga Jual
               </th>
               <th>
                 Discount
+              </th>
+              <th>
+                Profit
               </th>
               <th>
                 Total
@@ -90,26 +89,36 @@
                 <tr>
                   <td>{{ $key+1 }}</td>
                   <td>{{ $product->product->name }} - {{ $product->product->product_code }}</td>
+                  <td>
+                    @if ($product->capital_price)
+                        @currency($product->capital_price)
+                    @else
+                        -
+                    @endif
+                  </td>
                   <td>{{ $product->quantity }}</td>
+                  <td>
+                    @if ($product->price)
+                      @currency($product->price)
+                    @else
+                      -
+                    @endif
+                  </td>
                   @php
-
-                        $price = $product->product->price;
-                  
-                  @endphp
-                  <td>@currency($price)</td>
-                  @php
-                      $discountItem = $product->disc_rp + (($product->disc_prc/100) * ($price * $product->quantity));
+                      $discountItem = $product->disc_rp + (($product->disc_prc/100) * ($product->price * $product->quantity));
                   @endphp
                   <td>@currency($discountItem)</td>
-                  <td>@currency(($price * $product->quantity)- $discountItem)</td>
+                  <td>@currency(($product->price - $product->capital_price) * $product->quantity)
+                  </td>
+                  <td>@currency(($product->price * $product->quantity)- $discountItem)</td>
               </tr>
                 @endforeach
                 <tr>
-                  <td colspan="5" align="right"><b>SubTotal</b></td>
+                  <td colspan="7" align="right"><b>SubTotal</b></td>
                   <td>@currency($transaction->totalSementara)</td>
                 </tr>
                 <tr>
-                  <td colspan="5" align="right"><b>- Discount</b></td>
+                  <td colspan="7" align="right"><b>- Discount</b></td>
                   @php
                       $discPercent = ($transaction->disc_total_prc / 100) * $transaction->totalSementara;
                       $discount = $discPercent + $transaction->disc_total_rp;
@@ -118,20 +127,20 @@
                 </tr>
                 @if ($transaction->pay_using_points)
                 <tr>
-                  <td colspan="5" align="right"><b>- Bayar Pakai Point</b></td>
+                  <td colspan="7" align="right"><b>- Bayar Pakai Point</b></td>
                   <td>@currency($transaction->pay_using_points)</td>
                 </tr>
                 @endif
                 <tr>
-                  <td colspan="5" align="right"><b>Total Pembelian akhir</b></td>
+                  <td colspan="7" align="right"><b>Total Pembelian akhir</b></td>
                   <td>@currency($transaction->purchase_order)</td>
                 </tr>
                 <tr>
-                  <td colspan="5" align="right"><b>Bayar</b></td>
+                  <td colspan="7" align="right"><b>Bayar</b></td>
                   <td>@currency($transaction->pay)</td>
                 </tr>
                 <tr>
-                  <td colspan="5" align="right"><b>Kembalian</b></td>
+                  <td colspan="7" align="right"><b>Kembalian</b></td>
                   <td>@currency($transaction->return)</td>
                 </tr>
             </tbody>
